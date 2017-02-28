@@ -4,10 +4,11 @@ class Robot:
     def __init__(self, **kwargs):
         self.conf = kwargs
 
-        if 'q' in kwargs:
-            self._compute_ab()
-        else:
+        if 'q' not in kwargs:
             self._compute_q()
+        else:
+            self._compute_ab()
+            self._compute_theta()
 
     def draw(self): 
         _draw.draw(self)
@@ -16,12 +17,15 @@ class Robot:
         _draw.clear()
         self.__init__(kwargs)
 
+    def _compute_theta(self):
+        ''' theta = q1 + q2 + q3 + q4 + .. '''
+        self.conf['theta'] = sum(self.conf['q'])
+
     def _compute_ab(self):
         ''' compute missing a, b from l and q '''
 
         self.a = self._compute_part_ab(0, 0, math.cos)
         self.b = self._compute_part_ab(0, 0, math.sin)
-        self.theta = sum(self.conf['q'])
 
     def _compute_part_ab(self, i, q_sum, func):
         ''' compute part of equation recursivly, take func (sin or cos) to apply '''
@@ -41,25 +45,12 @@ class Robot:
         return  this_part + next_part
 
     def _compute_q(self):
-        ''' comp. missing q from a and b '''
+        ''' compute missing q from a and b '''
         pass
 
 def _alpha(l1, l2, r):
     return math.acos((l1 ** 2 + r ** 2 - l2 ** 2) / 2 * l1 * r)
 
-def hypotenuse(a, b):
+def _hypotenuse(a, b):
     ''' return length of hypotenuse in right angle '''
     return math.sqrt(a ** 2 + b ** 2)        
-
-if __name__=='__main__':
-    r = Robot([], [])
-    while True:
-        print("enter robot details")
-
-        l = [float(num) for num in input('lengths: ').split(' ')]
-        q = [float(num) for num in input('angles: ').split(' ')]
-
-        r.reset(l, q)
-        r.draw()
-
-        print()
