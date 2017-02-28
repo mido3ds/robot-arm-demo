@@ -7,7 +7,7 @@ pen.color('black')
 pen.speed(0)
 
 def draw(robot):
-    for l, q in zip(robot.l, robot.q):
+    for l, q in zip(robot.conf['l'], robot.conf['q']):
         pen.dot()
         pen.left(q)
         pen.forward(l)
@@ -20,19 +20,15 @@ def draw_hand():
     x,y = pen.pos()
     pen.dot()
 
-    pen.left(90)
-    pen.forward(10)
-    pen.right(90)
-    pen.forward(20)
+    for turn in (90, -90):
+        pen.left(turn)
+        pen.forward(10)
+        pen.right(turn)
+        pen.forward(20)
 
-    pen.penup()
-    pen.setpos(x,y)
-    pen.pendown()
-
-    pen.right(90)
-    pen.forward(10)
-    pen.left(90)
-    pen.forward(20)
+        pen.penup()
+        pen.setpos(x,y)
+        pen.pendown()
 
     pen.penup()
 

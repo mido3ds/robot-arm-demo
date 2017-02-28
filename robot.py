@@ -31,18 +31,15 @@ class Robot:
         ''' compute part of equation recursivly, take func (sin or cos) to apply '''
 
         # stop when you finish summing all q
-        if i == len(self.q): return 0
+        if i == len(self.conf['q']): return 0
 
         # update the whole sum with current q
-        q_sum += self.q[i]
+        q_sum += self.conf['q'][i]
 
-        # compute this part
-        this_part = self.l[i] * func(q_sum)
+        this_part = self.conf['q'][i] * func(q_sum)
+        next_part = self._compute_part_ab(i + 1, q_sum, func)
 
-        # compute the next part
-        next_part = self._compute_part(i + 1, q_sum, func)
-
-        return  this_part + next_part
+        return this_part + next_part
 
     def _compute_q(self):
         ''' compute missing q from a and b '''
