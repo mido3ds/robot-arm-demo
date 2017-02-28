@@ -5,6 +5,7 @@ pen = turtle.Turtle()
 pen.hideturtle()
 pen.color('black')
 pen.speed(0)
+turtle.tracer(0, 0)
 
 def draw(robot):
     for l, q in zip(robot.conf['l'], robot.conf['q']):
@@ -15,6 +16,8 @@ def draw(robot):
     draw_hand()
 
     pen.home()
+
+    turtle.update()
 
 def draw_hand():
     x,y = pen.pos()
@@ -35,3 +38,4 @@ def draw_hand():
 def clear():
     pen.clear()
     pen.home()
+    pen.pendown()

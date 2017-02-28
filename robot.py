@@ -10,12 +10,9 @@ class Robot:
             self._compute_ab()
             self._compute_theta()
 
+
     def draw(self): 
         _draw.draw(self)
-
-    def reset(self, **kwargs):
-        _draw.clear()
-        self.__init__(kwargs)
 
     def _compute_theta(self):
         ''' theta = q1 + q2 + q3 + q4 + .. '''
