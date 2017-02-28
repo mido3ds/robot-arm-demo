@@ -8,18 +8,20 @@ pen.speed(0)
 turtle.tracer(0, 0)
 
 def draw(robot):
-    for l, q in zip(robot.conf['l'], robot.conf['q']):
-        pen.dot()
-        pen.left(q)
-        pen.forward(l)
+    _clear()
 
-    draw_hand()
-
-    pen.home()
+    for angles in robot.q:
+        for l, q in zip(robot.l, angles):
+            pen.dot()
+            pen.left(q)
+            pen.forward(l)
+        _draw_hand()
+        pen.home()
+        pen.pendown()
 
     turtle.update()
 
-def draw_hand():
+def _draw_hand():
     x,y = pen.pos()
     pen.dot()
 
@@ -35,7 +37,7 @@ def draw_hand():
 
     pen.penup()
 
-def clear():
+def _clear():
     pen.clear()
     pen.home()
     pen.pendown()
