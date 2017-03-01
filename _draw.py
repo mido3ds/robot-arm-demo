@@ -1,8 +1,12 @@
 import turtle
 
-pen = turtle.Turtle()
+BASE_GIF = 'base.gif'
 
-pen.hideturtle()
+pen = turtle.Turtle()
+turtle.Screen().register_shape(BASE_GIF)
+pen.shape(BASE_GIF)
+
+# pen.hideturtle()
 pen.color('black')
 pen.speed(0)
 turtle.tracer(0, 0)
@@ -41,3 +45,12 @@ def _clear():
     pen.clear()
     pen.home()
     pen.pendown()
+
+def get_input(text='', title='input'):
+    return turtle.simpledialog.askstring(title, text)
+
+def output(*args):
+    turtle.simpledialog.messagebox.showinfo('output', ' '.join(str(arg) for arg in args))
+
+print = output
+input = get_input

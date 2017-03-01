@@ -4,13 +4,13 @@ class Robot:
     def __init__(self, **kwargs):
         if 'q' in kwargs:
             self.q = [kwargs['q'], ]
-        elif 'l' in kwargs:
+        if 'l' in kwargs:
             self.l = kwargs['l']
-        elif 'a' in kwargs:
+        if 'a' in kwargs:
             self.a = kwargs['a']
-        elif 'b' in kwargs:
+        if 'b' in kwargs:
             self.b = kwargs['b']
-        elif 'theta' in kwargs:
+        if 'theta' in kwargs:
             self.theta = kwargs['theta']
 
         if 'q' not in kwargs:
@@ -24,9 +24,7 @@ class Robot:
 
     def _compute_theta(self):
         ''' theta = q1 + q2 + q3 + q4 + .. '''
-        self.theta = []
-        for i in range(len(self.q)):
-            self.theta.append(sum(self.q[i]))
+        self.theta = sum(self.q[0])
 
     def _compute_ab(self):
         ''' compute missing a, b from l and q '''
@@ -38,12 +36,12 @@ class Robot:
         ''' compute part of equation recursivly, take func (sin or cos) to apply '''
 
         # stop when you finish summing all q
-        if i == len(self.q): return 0
+        if i == len(self.q[0]): return 0
 
         # update the whole sum with current q
-        q_sum += self.q[i]
+        q_sum += self.q[0][i]
 
-        this_part = self.q[i] * func(q_sum)
+        this_part = self.q[0][i] * func(q_sum)
         next_part = self._compute_part_ab(i + 1, q_sum, func)
 
         return this_part + next_part
