@@ -1,4 +1,4 @@
-import math, draw
+import math
 
 class Robot:
     def __init__(self, **kwargs):
@@ -18,10 +18,6 @@ class Robot:
         else:
             self._compute_ab()
             self._compute_theta()
-
-    def draw(self): 
-        draw.draw(self)
-        raise DeprecationWarning()
 
     def _compute_theta(self):
         ''' theta = q1 + q2 + q3 + q4 + .. '''

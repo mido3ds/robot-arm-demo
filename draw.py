@@ -1,15 +1,13 @@
 import turtle
 
-BASE_GIF = 'base.gif'
-turtle.register_shape(BASE_GIF)
-turtle.tracer(0, 0)
-
-class Turtle(turtle.RawTurtle):
+class Turtle:
     def __init__(self, robot, canvas=turtle.Screen()):
         self.canvas = canvas
-        turtle.RawTurtle.__init__(self, self.canvas, BASE_GIF)
+        self.pen = turtle.RawTurtles(self.canvas)
+        self.pen.hideturtle()
+        turtle.tracer(0, 0)
 
-        self.speed(0)
+        self.pen.speed(0)
         self.robot = robot
 
     def draw(self):
@@ -17,43 +15,32 @@ class Turtle(turtle.RawTurtle):
 
         for angles in self.robot.q:
             for l, q in zip(self.robot.l, angles):
-                self.dot()
-                self.left(q)
-                self.forward(l)
-            self.draw_hand()
-            self.home()
-            self.pendown()
+                self.pen.dot()
+                self.pen.left(q)
+                self.pen.forward(l)
+            self._draw_hand()
+            self.pen.home()
+            self.pen.pendown()
 
         self.canvas.update()
 
-    def draw_hand(self):
-        x,y = self.pos()
-        self.dot()
+    def _draw_hand(self):
+        x,y = self.pen.pos()
+        self.pen.dot()
 
         for turn in (90, -90):
-            self.left(turn)
-            self.forward(10)
-            self.right(turn)
-            self.forward(20)
+            self.pen.left(turn)
+            self.pen.forward(10)
+            self.pen.right(turn)
+            self.pen.forward(20)
 
-            self.penup()
-            self.setpos(x,y)
-            self.pendown()
+            self.pen.penup()
+            self.pen.setpos(x,y)
+            self.pen.pendown()
 
-        self.penup()
+        self.pen.penup()
 
     def _clear_and_return(self):
-        self.home()
-        self.clear()
-        self.pendown()
-
-def get_input(text='', title='input'):
-    raise DeprecationWarning()
-    return turtle.simpledialog.askstring(title, text)
-
-def give_output(*args):
-    raise DeprecationWarning()
-    turtle.simpledialog.messagebox.showinfo('output', ' '.join(str(arg) for arg in args))
-
-print = give_output
-input = get_input
+        self.pen.home()
+        self.pen.clear()
+        self.pen.pendown()
