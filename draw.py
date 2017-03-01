@@ -1,12 +1,12 @@
 import turtle
 
 BASE_GIF = 'base.gif'
+turtle.register_shape(BASE_GIF)
+turtle.tracer(0, 0)
 
 class Turtle(turtle.RawTurtle):
     def __init__(self, robot, canvas=turtle.Screen()):
         self.canvas = canvas
-        self.canvas.register_shape(BASE_GIF)
-        self.canvas.tracer(0, 0)
         turtle.RawTurtle.__init__(self, self.canvas, BASE_GIF)
 
         self.speed(0)
@@ -48,9 +48,11 @@ class Turtle(turtle.RawTurtle):
         self.pendown()
 
 def get_input(text='', title='input'):
+    raise DeprecationWarning()
     return turtle.simpledialog.askstring(title, text)
 
 def give_output(*args):
+    raise DeprecationWarning()
     turtle.simpledialog.messagebox.showinfo('output', ' '.join(str(arg) for arg in args))
 
 print = give_output
