@@ -1,15 +1,11 @@
 import turtle
 
 BASE_GIF = 'base.gif'
-
-pen = turtle.Turtle()
 turtle.Screen().register_shape(BASE_GIF)
-pen.shape(BASE_GIF)
-
-# pen.hideturtle()
-pen.color('black')
-pen.speed(0)
 turtle.tracer(0, 0)
+
+pen = turtle.Turtle(shape=BASE_GIF)
+pen.speed(0)
 
 def draw(robot):
     _clear()
@@ -42,15 +38,15 @@ def _draw_hand():
     pen.penup()
 
 def _clear():
-    pen.clear()
     pen.home()
+    pen.clear()
     pen.pendown()
 
 def get_input(text='', title='input'):
     return turtle.simpledialog.askstring(title, text)
 
-def output(*args):
+def give_output(*args):
     turtle.simpledialog.messagebox.showinfo('output', ' '.join(str(arg) for arg in args))
 
-print = output
+print = give_output
 input = get_input
