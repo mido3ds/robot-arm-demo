@@ -1,6 +1,6 @@
 import tkinter as tk
 from robot import Robot
-import turtle
+import draw
 
 def get_input(text='', title='input'):
     return tk.simpledialog.askstring(title, text)
@@ -17,13 +17,12 @@ class App(tk.Frame):
         tk.Frame.__init__(self, master=self.root)
         self.pack()
 
-        tk.Button(self, text='hello button').pack()
-
         self.make_robot()
         self.make_canvas()
-        self.draw()
+        self.pen.draw()
 
     def make_robot(self):
+        input = lambda: '100 200; 20 30'
         dialog = input().split(';')
         for i, part in enumerate(dialog):
             dialog[i] = [float(num) for num in part.strip(' ').split(' ')]
@@ -37,47 +36,9 @@ class App(tk.Frame):
 
 
     def make_canvas(self):
-        self.canvas = turtle.Canvas(self)
+        self.canvas = draw.turtle.Canvas(self, width=800, height=800)
         self.canvas.pack()
 
-        self.pen = turtle.RawTurtle(self.canvas)
-        self.pen.hideturtle()
-
-        self.pen.speed(0)
-
-    def draw(self):
-        self._clear_and_return()
-
-        for angles in self.robot.q:
-            for l, q in zip(self.robot.l, angles):
-                self.pen.dot()
-                self.pen.left(q)
-                self.pen.forward(l)
-            self._draw_hand()
-            self.pen.home()
-            self.pen.pendown()
-
-        self.canvas.update()
-
-    def _draw_hand(self):
-        x,y = self.pen.pos()
-        self.pen.dot()
-
-        for turn in (90, -90):
-            self.pen.left(turn)
-            self.pen.forward(10)
-            self.pen.right(turn)
-            self.pen.forward(20)
-
-            self.pen.penup()
-            self.pen.setpos(x,y)
-            self.pen.pendown()
-
-        self.pen.penup()
-
-    def _clear_and_return(self):
-        self.pen.home()
-        self.pen.clear()
-        self.pen.pendown()
+        self.pen = draw.Turtle(self.robot, self.canvas)
 
 App().mainloop()
