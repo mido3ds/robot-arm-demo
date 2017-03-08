@@ -20,7 +20,6 @@ class App(tk.Frame):
         self.make_canvas()
         self.make_buttons()
 
-        
     def make_buttons(self):
         self.le = tk.Entry(self)
         self.le.pack()
@@ -38,10 +37,6 @@ class App(tk.Frame):
         self.abe.pack()
         tk.Label(self, text='a and b').pack()
 
-        # make them clear content when clicked on 
-        for entry in [self.le, self.qe, self.abe, self.thetae]:
-            entry.bind('<Button-1>', self.clear_entry_text)
-
         self.subm_butt = tk.Button(self, text='Make Robot')
         self.subm_butt.pack()
         self.subm_butt.bind('<Button-1>', self.get_data)
@@ -52,17 +47,11 @@ class App(tk.Frame):
             text = entry.get()
             if text != '':
                 try:
-                    self.data.append( 
-                        [float(num) for num in text.strip(' ').split(',')]
-                    )
+                    self.data.append([float(num) for num in text.strip(' ').split(',')])
                 except:
                     tk.messagebox.showerror('Error', 'entered numbers are not correct, please try again')
         self.make_robot()
         self.pen.draw()
-
-    def clear_entry_text(self, event):
-        event.widget.delete(0, tk.END)
-
 
     def make_robot(self):
         dialog = self.data
@@ -73,13 +62,6 @@ class App(tk.Frame):
         elif len(dialog) == 4:
             self.robot = Robot(l=dialog[0], a=dialog[1][0], b=dialog[1][1], theta=dialog[2])
         self.pen.robot = self.robot
-
-    def animate_360(self):
-        for q0 in range(0, 360):
-            for q1 in range(0, 360):
-                self.robot.q[0][0] = q0
-                self.robot.q[0][1] = q1
-                self.pen.draw()
 
     def make_canvas(self):
         self.canvas = tk.Canvas(self, width=400, height=400)
