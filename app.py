@@ -24,7 +24,7 @@ class App(tk.Frame):
     def make_buttons(self):
         self.le = tk.Entry(self)
         self.le.pack()
-        tk.Label(self, text='length').pack(side='left')
+        tk.Label(self, text='length').pack()
 
         self.qe = tk.Entry(self)
         self.qe.pack()
