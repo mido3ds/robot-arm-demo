@@ -15,30 +15,30 @@ class App(tk.Frame):
     def __init__(self):
         self.root = tk.Tk()
         tk.Frame.__init__(self, master=self.root)
-        self.pack()
+        self.grid()
 
         self.make_canvas()
         self.make_buttons()
 
     def make_buttons(self):
         self.le = tk.Entry(self)
-        self.le.pack()
-        tk.Label(self, text='length').pack()
+        tk.Label(self, text='length').grid()
+        self.le.grid()
 
         self.qe = tk.Entry(self)
-        self.qe.pack()
-        tk.Label(self, text='angles').pack()
+        tk.Label(self, text='angles').grid()
+        self.qe.grid()
 
         self.thetae = tk.Entry(self)
-        self.thetae.pack()
-        tk.Label(self, text='theta').pack()
+        tk.Label(self, text='theta').grid()
+        self.thetae.grid()
 
         self.abe = tk.Entry(self)
-        self.abe.pack()
-        tk.Label(self, text='a and b').pack()
+        tk.Label(self, text='a and b').grid()
+        self.abe.grid()
 
         self.subm_butt = tk.Button(self, text='Make Robot')
-        self.subm_butt.pack()
+        self.subm_butt.grid()
         self.subm_butt.bind('<Button-1>', self.get_data)
 
     def get_data(self, event):
@@ -65,7 +65,7 @@ class App(tk.Frame):
 
     def make_canvas(self):
         self.canvas = tk.Canvas(self, width=400, height=400)
-        self.canvas.pack()
+        self.canvas.grid()
 
         self.pen = draw.Turtle(None, self.canvas)
 

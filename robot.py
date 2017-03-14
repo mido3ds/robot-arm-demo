@@ -38,7 +38,7 @@ class Robot:
         # update the whole sum with current q
         q_sum += self.q[0][i]
 
-        this_part = self.q[0][i] * func(q_sum)
+        this_part = self.l[i] * func(q_sum)
         next_part = self._compute_part_ab(i + 1, q_sum, func)
 
         return this_part + next_part
