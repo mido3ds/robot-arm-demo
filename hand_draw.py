@@ -12,7 +12,7 @@ class Drawer(turtle.RawTurtle):
     def draw(self):
         self._clear_and_return()
 
-        for angles in ['specific_q', 'specific_q2']:
+        for angles in ['q_inv', 'q_inv2']:
             if angles not in self.robot:
                 break
 

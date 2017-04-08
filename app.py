@@ -1,12 +1,12 @@
 #!/usr/bin/env python3.6
 import argparse
 import os.path as path
+
 import working_area
-import handdraw
-
+import hand_draw
 import mymath
-import numpy as np
 
+import numpy as np
 import matplotlib
 matplotlib.use('TkAgg')
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -22,6 +22,7 @@ class Conf:
 
 
 def read_file(file_name):
+    # get file
     try:
         with open(file_name) as f:
             inp = f.read()
@@ -30,19 +31,20 @@ def read_file(file_name):
                         'file name should be input.txt '
                         'and be in the same folder')
 
+    # execute it, to get variables in this locals scope
     try:
         exec(inp)
     except:
         raise Exception('cant read file')
 
+    # construct robot
     try:
         robot = {
-            'mode': locals()['mode'],
-
+            'do_inverse': locals()['do_inverse'],
             'l': np.array(locals()['l']),  # 1D array
             'theta': locals()['θ'],
 
-            'specific_q': np.array(locals()['specific_q']),  # 1D array
+            'q_torq': np.array(locals()['q_torq']),  # 1D array
             'pex': np.matrix(locals()['Pex']).transpose(),  # 2D 3x1 matrix
 
             'q': locals()['q'],
@@ -50,8 +52,8 @@ def read_file(file_name):
             'b': locals()['b'],
 
             # added
-            'jacob': np.zeros((3, 3)),
-            'torque': np.zeros((3, 1)),
+            'torque': np.zeros((3,1)),
+            'jacob': np.zeros((3,3))
         }
     except:
         raise Exception('cant get variables from file,'
@@ -63,17 +65,19 @@ def read_file(file_name):
 
 
 def calc_inverse_km(robot):
-    ''' return q1, q2 (each is 1D array) from l, a,b, theta  '''
+    ''' calc q_inv1, q_inv2 (each is 1D array) from l, a,b, theta  '''
     theta = robot['theta']
     l1 = robot['l'][0]
+    l2 = robot['l'][1]
+    l3 = robot['l'][2]
 
-    a1 = robot['a'] - l3 * np.cos(theta)
-    b1 = robot['b'] - l3 * np.sin(theta)
+    a1 = robot['a'] - l3 * mymath.cosd(theta)
+    b1 = robot['b'] - l3 * mymath.sind(theta)
     r = mymath.hypotenuse(a1, b1)
+    alpha = mymath.alpha(l1, l2, r)
 
-    q1 = _calc_inverse_km(a1, b1, r, l1, theta, +alpha)
-    q2 = _calc_inverse_km(a1, b1, r, l1, theta, -alpha)
-    return q1, q2
+    robot['q_inv1'] = _calc_inverse_km(a1, b1, r, l1, theta, +alpha)
+    robot['q_inv2'] = _calc_inverse_km(a1, b1, r, l1, theta, -alpha)
 
 
 def _calc_inverse_km(a1, b1, r, l1, theta, alpha):
@@ -86,9 +90,9 @@ def _calc_inverse_km(a1, b1, r, l1, theta, alpha):
 ########################################################################
 
 
-def get_working_area(robot, step):
+def calc_working_area(robot, step):
     ''' return all x, y of end effector to plot '''
-    return working_area.get_xy(
+    robot['work_area'] = working_area.get_xy(
         q1=robot['q'][0],
         q2=robot['q'][1],
         q3=robot['q'][2],
@@ -110,8 +114,8 @@ def calc_jacobian(robot):
     get_dr = lambda ls, qs, func: np.array(
         [ls[i] * func(sum(qs[:i + 1])) for i in range(3)])
 
-    dr1 = -1 * get_dr(robot['l'], robot['specific_q'], mymath.sind)
-    dr2 = get_dr(robot['l'], robot['specific_q'], mymath.cosd)
+    dr1 = -1 * get_dr(robot['l'], robot['q_torq'], mymath.sind)
+    dr2 = get_dr(robot['l'], robot['q_torq'], mymath.cosd)
 
     robot['jacob'] = np.mat([
         [sum(dr1[i:]) for i in range(3)],
@@ -122,10 +126,17 @@ def calc_jacobian(robot):
 ########################################################################
 
 
-def calc_all(robot):
+def calc_all(robot, step):
     ''' cal all missing data for robot, then return it '''
-    calc_jacobian(robot)
-    calc_torque(robot)
+    try:
+        calc_working_area(robot, step)
+        if robot['do_inverse']:
+            calc_inverse_km(robot)
+        calc_jacobian(robot)
+        calc_torque(robot)
+    except:
+        print('Mathmatical Error, please review numbers in file')
+
     return robot
 
 ########################################################################
@@ -142,10 +153,10 @@ class App(tk.Frame):
 
         self.get_args()
 
-        # handdraw canvas
+        # hand_draw canvas
         self.drw_canvas = tk.Canvas(self, width=400, height=400)
         self.drw_canvas.pack(side='right')
-        self.drawer = handdraw.Drawer({}, self.drw_canvas)
+        self.drawer = hand_draw.Drawer({}, self.drw_canvas)
 
         # plot canvas
         self.fig = Figure(figsize=(5, 4), dpi=100)
@@ -178,7 +189,7 @@ class App(tk.Frame):
 
     def update_ui(self, event):
         self.robot = read_file(self.args.input_file)
-        self.robot = calc_all(self.robot)
+        self.robot = calc_all(robot=self.robot, step=self.args.step)
 
         # labels
         self.lbl_torq1['text'] = self.robot['torque'][0, 0]
@@ -190,14 +201,12 @@ class App(tk.Frame):
         self.drawer.draw()
 
         # plot
-        x, y = get_working_area(robot=self.robot, step=self.args.step)
-
         self.fig.clear()
         self.subplt = self.fig.add_subplot(111)
 
+        x, y = self.robot['work_area']
         self.subplt.plot(x, y, 'g.')
         self.plt_canvas.draw()
-
 
     def get_args(self):
         parser = argparse.ArgumentParser()
