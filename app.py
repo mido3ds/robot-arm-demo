@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.6
 import argparse
+import os.path as path
 import smooth
 import handdraw
 
@@ -12,32 +13,10 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 import tkinter as tk
 
-INPUT_FILE = 'input.txt'
 
-mock = """# choose 'inverse' or 'direct'
-mode        =       'direct'
-
-##################       GENERAL      ####################
-
-l           =       [0, 0, 0]
-
-θ           =       0
-
-Pex         =       [0, 0, 0]         #  [Fx, Fy, M]
-
-specific_q  =       [0, 0, 0]      #  q values to get torque at
-
-##################  DIRECT KINEMATICS  ################### >>> l, q, θ
-
-q           =       [[0, 0],    # <= [q1_min, q2_max]
-                     [0, 0],
-                     [0, 0]]
-
-###################  INVERSE KINEMATICS  ################# >>> l, a, b, θ 
-
-a           =       0
-b           =       0
-"""
+class Conf:
+    input_file = path.join(path.dirname(path.realpath(__file__)), 'input.txt')
+    step = 5
 
 ########################################################################
 
@@ -47,10 +26,9 @@ def read_file(file_name):
         with open(file_name) as f:
             inp = f.read()
     except:
-        # raise Exception('cant open file, '
-        #                 'file name should be input.txt '
-        #                 'and be in the same folder')
-        inp = mock
+        raise Exception('cant open file, '
+                        'file name should be input.txt '
+                        'and be in the same folder')
 
     try:
         exec(inp)
@@ -74,7 +52,6 @@ def read_file(file_name):
             # added
             'jacob': np.zeros((3, 3)),
             'torque': np.zeros((3, 1)),
-            'specific_q2': np.zeros(3)
         }
     except:
         raise Exception('cant get variables from file,'
@@ -129,13 +106,25 @@ def calc_torque(robot):
 
 def calc_jacobian(robot):
     ''' 3x3 matrix, see slide num 4 page 12 '''
-    pass
+    get_dr = lambda ls, qs, func: np.array(
+        [ls[i] * func(sum(qs[:i + 1])) for i in range(3)])
+
+    dr1 = -1 * get_dr(robot['l'], robot['specific_q'], mymath.sind)
+    dr2 = get_dr(robot['l'], robot['specific_q'], mymath.cosd)
+
+    robot['jacob'] = np.mat([
+        [sum(dr1[i:]) for i in range(3)],
+        [sum(dr2[i:]) for i in range(3)],
+        [1, 1, 1]
+    ])
 
 ########################################################################
 
 
 def calc_all(robot):
     ''' cal all missing data for robot, then return it '''
+    calc_jacobian(robot)
+    calc_torque(robot)
     return robot
 
 ########################################################################
@@ -171,15 +160,15 @@ class App(tk.Frame):
         self.btn_update.bind('<Button-1>', self.update_ui)
 
         # labels
-        self.lbl_torq3 = tk.Label(self, text='torque3')
+        self.lbl_torq3 = tk.Label(self)
         self.lbl_torq3.pack(side='bottom')
         tk.Label(self, text='torque3').pack(side='bottom')
 
-        self.lbl_torq2 = tk.Label(self, text='torque2')
+        self.lbl_torq2 = tk.Label(self)
         self.lbl_torq2.pack(side='bottom')
         tk.Label(self, text='torque2').pack(side='bottom')
 
-        self.lbl_torq1 = tk.Label(self, text='torque1')
+        self.lbl_torq1 = tk.Label(self)
         self.lbl_torq1.pack(side='bottom')
         tk.Label(self, text='torque1').pack(side='bottom')
 
@@ -211,8 +200,9 @@ class App(tk.Frame):
     def get_args(self):
         parser = argparse.ArgumentParser()
 
-        parser.add_argument('input_file', nargs='?', default=INPUT_FILE)
-        parser.add_argument('-s', '--step', nargs='?', default=3, type=int)
+        parser.add_argument('input_file', nargs='?', default=Conf.input_file)
+        parser.add_argument('-s', '--step', nargs='?',
+                            default=Conf.step, type=int)
 
         self.args = parser.parse_args()
 

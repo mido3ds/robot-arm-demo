@@ -3,19 +3,19 @@ mode        =       'direct'
 
 ##################       GENERAL      ####################
 
-l           =       [0, 0, 0]
+l           =       [20, 20, 20]
 
-θ           =       0
+θ           =       30
 
-Pex         =       [0, 0, 0]         #  [Fx, Fy, M]
+Pex         =       [1,1,1]         #  [Fx, Fy, M]
 
-specific_q  =       [0, 0, 0]      #  q values to get torque at
+specific_q  =       [20, 30, 40]      #  q values to get torque at
 
 ##################  DIRECT KINEMATICS  ################### >>> l, q, θ
 
-q           =       [[0, 0],    # <= [q1_min, q2_max]
-                     [0, 0],
-                     [0, 0]]
+q           =       [[-90, 90],    # <= [q1_min, q2_max]
+                     [-90, 90],
+                     [-90, 90]]
 
 ###################  INVERSE KINEMATICS  ################# >>> l, a, b, θ 
 
