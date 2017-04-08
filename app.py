@@ -7,6 +7,8 @@ import numpy as np
 
 INPUT_FILE = 'input.txt'
 
+########################################################################
+
 
 def read_file(file_name=INPUT_FILE):
     try:
@@ -42,14 +44,34 @@ def read_file(file_name=INPUT_FILE):
 
     return robot
 
+########################################################################
 
-def calc_inverse_km(robot):
-    ''' calc q from l, a,b, theta  '''
-    pass
+
+def get_inverse_km(robot):
+    ''' return q1, q2 (each is 1D array) from l, a,b, theta  '''
+    theta = robot['theta']
+    l1 = robot['l'][0]
+
+    a1 = robot['a'] - l3 * math.cos(theta)
+    b1 = robot['b'] - l3 * math.sin(theta)
+    r = mymath.hypotenuse(a1, b1)
+
+    q1 = _get_inverse_km(a1, b1, r, l1, theta, +alpha)
+    q2 = _get_inverse_km(a1, b1, r, l1, theta, -alpha)
+    return q1, q2
+
+
+def _get_inverse_km(a1, b1, r, l1, theta, alpha):
+    q1 = mymath.atan2d(b1 / a1) - alpha
+    q2 = mymath.atan2d((r * math.sin(alpha)) / (r * math.acos(alpha) - l1))
+    q3 = theta - q1 - q2
+    return np.array([q1, q2, q3])
+
+########################################################################
 
 
 def get_working_area(robot, step=3):
-    ''' return 2D array of x, y to plot '''
+    ''' return all x, y of end effector to plot '''
     return smooth.get_xy(
         q1=robot['q'][0],
         q2=robot['q'][1],
@@ -58,6 +80,8 @@ def get_working_area(robot, step=3):
 
         step=step,
     )
+
+########################################################################
 
 
 def calc_torque(robot):
@@ -70,6 +94,8 @@ def calc_jacobian(robot):
     ''' 3x3 matrix, see slide num 4 page 12 '''
     robot['jacob'] = None
     raise NotImplementedError()
+
+########################################################################
 
 
 def build_parser():
