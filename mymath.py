@@ -1,20 +1,32 @@
-import math
+import numpy as np
 
 
 def acosd(x):
-    return math.degrees(math.acos(x))
+    return np.degrees(np.acos(x))
 
 
 def asind(x):
-    return math.degrees(math.asin(x))
+    return np.degrees(np.asin(x))
 
 
 def atan2d(x):
-    return math.degrees(math.atan2(x))
+    return np.degrees(np.atan2(x))
 
 
 def atand(x):
-    return math.degrees(math.atan(x))
+    return np.degrees(np.atan(x))
+
+
+def sind(x):
+    return np.sin(np.radians(x))
+
+
+def cosd(x):
+    return np.cos(np.radians(x))
+
+
+def tand(x):
+    return np.tan(np.radians(x))
 
 
 def alpha(l1, l2, r):
@@ -23,4 +35,4 @@ def alpha(l1, l2, r):
 
 def hypotenuse(a, b):
     ''' return length of hypotenuse in right angle '''
-    return math.sqrt(a ** 2 + b ** 2)
+    return np.sqrt(a ** 2 + b ** 2)
