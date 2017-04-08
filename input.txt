@@ -9,6 +9,8 @@ l =  [0, 0, 0]
 
 Pex = [0, 0, 0]         #  [Fx, Fy, M]
 
+specific_q = [0, 0, 0]      #  q values to get torque at
+
 ##################  DIRECT KINEMATICS  ################### >>> l, q, θ
 
 q = [[0, 0],    # <= [q1_min, q2_max]
