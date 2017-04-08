@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.6
 import argparse
+import smooth
 import numpy as np
 
 INPUT_FILE = 'input.txt'
@@ -40,19 +41,21 @@ def read_file(file_name=INPUT_FILE):
     return robot
 
 
-def direct_km(robot):
-    ''' get a, b from l, q, theta  '''
-    pass
-
-
 def inverse_km(robot):
     ''' get q from l, a,b, theta  '''
     pass
 
 
-def get_working_area(robot):
+def get_working_area(robot, step=3):
     ''' get 2D array of x, y to plot '''
-    pass
+    return smooth.get_xy(
+        q1=robot['q'][0],
+        q2=robot['q'][1],
+        q3=robot['q'][2],
+        l=robot['l'],
+
+        step=step,
+    )
 
 
 def get_torque(robot):
