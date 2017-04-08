@@ -1,8 +1,10 @@
 #!/usr/bin/env python3.6
 import argparse
 import smooth
+import handdraw
 import mymath
 import math
+import tkinter as tk
 import numpy as np
 
 INPUT_FILE = 'input.txt'
@@ -10,7 +12,7 @@ INPUT_FILE = 'input.txt'
 ########################################################################
 
 
-def read_file(file_name=INPUT_FILE):
+def read_file(file_name):
     try:
         with open(file_name) as f:
             inp = f.read()
@@ -37,6 +39,11 @@ def read_file(file_name=INPUT_FILE):
             'q': locals()['q'],
             'a': locals()['a'],
             'b': locals()['b'],
+
+            # added
+            'jacob': np.zeros((3, 3)),
+            'torque': np.zeros((3, 1)),
+            'specific_q2': np.zeros(3)
         }
     except:
         raise Exception('cant get variables from file,'
@@ -70,7 +77,7 @@ def _get_inverse_km(a1, b1, r, l1, theta, alpha):
 ########################################################################
 
 
-def get_working_area(robot, step=3):
+def get_working_area(robot, step):
     ''' return all x, y of end effector to plot '''
     return smooth.get_xy(
         q1=robot['q'][0],
@@ -98,17 +105,55 @@ def calc_jacobian(robot):
 ########################################################################
 
 
-def build_parser():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', nargs='?')
-    return parser
+class App(tk.Frame):
 
+    def __init__(self):
+        self.root = tk.Tk()
 
-def main(args):
-    pass
+        tk.Frame.__init__(self, master=self.root, takefocus=True)
+        self.pack()
+
+        # handdraw canvas
+        self.canvas = tk.Canvas(self, width=400, height=400)
+        self.canvas.pack(side='right')
+        self.drawer = handdraw.Drawer({})
+
+        # plot canvas
+        pass
+
+        # buttons
+        self.btn_update = tk.Button(self, text='update')
+        self.btn_update.pack(side='bottom')
+        self.btn_update.bind('<Button-1>', self.update_data)
+
+        # labels
+        self.lbl_torq1 = tk.Label(self, text='torque1')
+        self.lbl_torq1.pack(side='bottom')
+
+        self.lbl_torq2 = tk.Label(self, text='torque2')
+        self.lbl_torq2.pack(side='bottom')
+
+        self.lbl_torq2 = tk.Label(self, text='torque2')
+        self.lbl_torq2.pack(side='bottom')
+
+    def update_data(self, event):
+        self.robot = read_file(self.args.input_file)
+
+        # update draw
+        self.drawer.draw()
+
+        # update plot
+        x, y = get_working_area(robot=self.robot, step=self.args.step)
+        raise NotImplementedError()
+
+    def get_args(self):
+        parser = argparse.ArgumentParser()
+
+        parser.add_argument('input_file', nargs='?', default=INPUT_FILE)
+        parser.add_argument('-s', '--step', nargs='?', default=3)
+
+        self.args = parser.parse_args()
+
 
 if __name__ == '__main__':
-    args = build_parser().parse_args()
-    INPUT_FILE = args.input_file or INPUT_FILE
-
-    main(args)
+    App().mainloop()

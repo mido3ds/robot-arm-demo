@@ -1,6 +1,6 @@
 import turtle
 
-class Turtle(turtle.RawTurtle):
+class Drawer(turtle.RawTurtle):
     def __init__(self, robot, canvas):
         self.canvas = canvas
         turtle.RawTurtle.__init__(self, canvas=self.canvas)
@@ -12,8 +12,11 @@ class Turtle(turtle.RawTurtle):
     def draw(self):
         self._clear_and_return()
 
-        for angles in self.robot.q:
-            for l, q in zip(self.robot.l, angles):
+        for angles in ['specific_q', 'specific_q2']:
+            if angles not in self.robot:
+                break
+
+            for l, q in zip(self.robot['l'], self.robot[angles]):
                 self.dot()
                 self.left(q)
                 self.forward(l)
