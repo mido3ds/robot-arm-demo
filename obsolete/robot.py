@@ -1,6 +1,8 @@
 import math
 
+
 class Robot:
+
     def __init__(self, **kwargs):
         self.q = [kwargs.get('q'), ]
         self.l = kwargs.get('l')
@@ -28,7 +30,8 @@ class Robot:
         ''' compute part of equation recursivly, take func (sin or cos) to apply '''
 
         # stop when you finish summing all q
-        if i == len(self.q[0]): return 0
+        if i == len(self.q[0]):
+            return 0
 
         # update the whole sum with current q
         q_sum += self.q[0][i]
@@ -52,8 +55,6 @@ class Robot:
             b = self.b
             self.q = self._compute_q_2joints(a, b)
 
-
-
     def _compute_q_2joints(self, a, b):
         ''' compute q for joints system '''
         r = _hypotenuse(a, b)
@@ -71,6 +72,7 @@ class Robot:
 def _alpha(l1, l2, r):
     return math.acos((l1 ** 2 + r ** 2 - l2 ** 2) / 2 * l1 * r)
 
+
 def _hypotenuse(a, b):
     ''' return length of hypotenuse in right angle '''
-    return math.sqrt(a ** 2 + b ** 2)        
+    return math.sqrt(a ** 2 + b ** 2)

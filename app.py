@@ -1,6 +1,8 @@
 #!/usr/bin/env python3.6
 import argparse
 import smooth
+import mymath
+import math
 import numpy as np
 
 INPUT_FILE = 'input.txt'
@@ -41,13 +43,13 @@ def read_file(file_name=INPUT_FILE):
     return robot
 
 
-def inverse_km(robot):
-    ''' get q from l, a,b, theta  '''
+def calc_inverse_km(robot):
+    ''' calc q from l, a,b, theta  '''
     pass
 
 
 def get_working_area(robot, step=3):
-    ''' get 2D array of x, y to plot '''
+    ''' return 2D array of x, y to plot '''
     return smooth.get_xy(
         q1=robot['q'][0],
         q2=robot['q'][1],
@@ -58,14 +60,16 @@ def get_working_area(robot, step=3):
     )
 
 
-def get_torque(robot):
+def calc_torque(robot):
     ''' 3x1 matrix, Q = -J.T x Pex '''
-    return np.matmul(-1 * get_jacobian(robot).transpose(), robot['pex'])
+    calc_jacobian()
+    robot['torque'] = np.matmul(-1 * robot['jacob'].transpose(), robot['pex'])
 
 
-def get_jacobian(robot):
+def calc_jacobian(robot):
     ''' 3x3 matrix, see slide num 4 page 12 '''
-    pass
+    robot['jacob'] = None
+    raise NotImplementedError()
 
 
 def build_parser():
