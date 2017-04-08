@@ -2,16 +2,11 @@ import math
 
 class Robot:
     def __init__(self, **kwargs):
-        if 'q' in kwargs:
-            self.q = [kwargs['q'], ]
-        if 'l' in kwargs:
-            self.l = kwargs['l']
-        if 'a' in kwargs:
-            self.a = kwargs['a']
-        if 'b' in kwargs:
-            self.b = kwargs['b']
-        if 'theta' in kwargs:
-            self.theta = kwargs['theta']
+        self.q = [kwargs.get('q'), ]
+        self.l = kwargs.get('l')
+        self.a = kwargs.get('a')
+        self.b = kwargs.get('b')
+        self.theta = kwargs.get('theta')
 
         if 'q' not in kwargs:
             self._compute_q()
