@@ -1,1 +1,21 @@
-#  this is an edit
+# choose 'inverse' or 'direct'
+mode = 'direct'
+
+##################       GENERAL      ####################
+
+l =  [0, 0, 0]
+
+θ = 0
+
+Pex = [0, 0, 0]         #  [Fx, Fy, M]
+
+##################  DIRECT KINEMATICS  ################### >>> l, q, θ
+
+q = [[0, 0],    # <= [q1_min, q2_max]
+     [0, 0],
+     [0, 0]]
+
+###################  INVERSE KINEMATICS  ################# >>> l, a, b, θ 
+
+a = 0
+b = 0
