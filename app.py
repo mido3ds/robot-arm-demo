@@ -1,7 +1,7 @@
 #!/usr/bin/env python3.6
 import argparse
 import os.path as path
-import smooth
+import working_area
 import handdraw
 
 import mymath
@@ -16,7 +16,7 @@ import tkinter as tk
 
 class Conf:
     input_file = path.join(path.dirname(path.realpath(__file__)), 'input.txt')
-    step = 5
+    step = 6
 
 ########################################################################
 
@@ -62,7 +62,7 @@ def read_file(file_name):
 ########################################################################
 
 
-def get_inverse_km(robot):
+def calc_inverse_km(robot):
     ''' return q1, q2 (each is 1D array) from l, a,b, theta  '''
     theta = robot['theta']
     l1 = robot['l'][0]
@@ -71,12 +71,13 @@ def get_inverse_km(robot):
     b1 = robot['b'] - l3 * np.sin(theta)
     r = mymath.hypotenuse(a1, b1)
 
-    q1 = _get_inverse_km(a1, b1, r, l1, theta, +alpha)
-    q2 = _get_inverse_km(a1, b1, r, l1, theta, -alpha)
+    q1 = _calc_inverse_km(a1, b1, r, l1, theta, +alpha)
+    q2 = _calc_inverse_km(a1, b1, r, l1, theta, -alpha)
     return q1, q2
 
 
-def _get_inverse_km(a1, b1, r, l1, theta, alpha):
+def _calc_inverse_km(a1, b1, r, l1, theta, alpha):
+    ''' get one part '''
     q1 = mymath.atan2d(b1 / a1) - alpha
     q2 = mymath.atan2d((r * np.sin(alpha)) / (r * np.acos(alpha) - l1))
     q3 = theta - q1 - q2
@@ -87,7 +88,7 @@ def _get_inverse_km(a1, b1, r, l1, theta, alpha):
 
 def get_working_area(robot, step):
     ''' return all x, y of end effector to plot '''
-    return smooth.get_xy(
+    return working_area.get_xy(
         q1=robot['q'][0],
         q2=robot['q'][1],
         q3=robot['q'][2],
@@ -179,6 +180,11 @@ class App(tk.Frame):
         self.robot = read_file(self.args.input_file)
         self.robot = calc_all(self.robot)
 
+        # labels
+        self.lbl_torq1['text'] = self.robot['torque'][0, 0]
+        self.lbl_torq2['text'] = self.robot['torque'][1, 0]
+        self.lbl_torq3['text'] = self.robot['torque'][2, 0]
+
         # draw
         self.drawer.robot = self.robot
         self.drawer.draw()
@@ -192,10 +198,6 @@ class App(tk.Frame):
         self.subplt.plot(x, y, 'g.')
         self.plt_canvas.draw()
 
-        # labels
-        self.lbl_torq1['text'] = self.robot['torque'][0, 0]
-        self.lbl_torq2['text'] = self.robot['torque'][1, 0]
-        self.lbl_torq3['text'] = self.robot['torque'][2, 0]
 
     def get_args(self):
         parser = argparse.ArgumentParser()
