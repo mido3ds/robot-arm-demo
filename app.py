@@ -5,9 +5,9 @@ import numpy as np
 INPUT_FILE = 'input.txt'
 
 
-def read_file():
+def read_file(file_name=INPUT_FILE):
     try:
-        with open(INPUT_FILE) as f:
+        with open(file_name) as f:
             inp = f.read()
     except:
         raise Exception('cant open file, '
@@ -56,18 +56,17 @@ def get_working_area(robot):
 
 
 def get_torque(robot):
-    ''' Q = -J.T x Pex '''
-    pass
+    ''' 3x1 matrix, Q = -J.T x Pex '''
+    return np.matmul(-1 * get_jacobian(robot).transpose(), robot['pex'])
 
 
 def get_jacobian(robot):
-    ''' slide num 4 page 12 '''
+    ''' 3x3 matrix, see slide num 4 page 12 '''
     pass
 
 
 def build_parser():
     parser = argparse.ArgumentParser()
-
     parser.add_argument('input_file', nargs='?')
     return parser
 
