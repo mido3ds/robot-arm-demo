@@ -134,6 +134,13 @@ def calc_jacobian(robot):
 ########################################################################
 
 
+def calc_all(robot):
+    ''' cal all missing data for robot, then return it '''
+    return robot
+
+########################################################################
+
+
 class App(tk.Frame):
 
     def __init__(self):
@@ -161,22 +168,27 @@ class App(tk.Frame):
         # buttons
         self.btn_update = tk.Button(self, text='update')
         self.btn_update.pack(side='bottom')
-        self.btn_update.bind('<Button-1>', self.update_data)
+        self.btn_update.bind('<Button-1>', self.update_ui)
 
         # labels
         self.lbl_torq3 = tk.Label(self, text='torque3')
         self.lbl_torq3.pack(side='bottom')
+        tk.Label(self, text='torque3').pack(side='bottom')
 
         self.lbl_torq2 = tk.Label(self, text='torque2')
         self.lbl_torq2.pack(side='bottom')
+        tk.Label(self, text='torque2').pack(side='bottom')
 
         self.lbl_torq1 = tk.Label(self, text='torque1')
         self.lbl_torq1.pack(side='bottom')
+        tk.Label(self, text='torque1').pack(side='bottom')
 
+        # update once
+        self.update_ui(None)
 
-
-    def update_data(self, event):
+    def update_ui(self, event):
         self.robot = read_file(self.args.input_file)
+        self.robot = calc_all(self.robot)
 
         # draw
         self.drawer.robot = self.robot
@@ -191,15 +203,10 @@ class App(tk.Frame):
         self.subplt.plot(x, y, 'g.')
         self.plt_canvas.draw()
 
-        # get jacob then torque
-        calc_jacobian(self.robot)
-        calc_torque(self.robot)
-
-        # update labels
+        # labels
         self.lbl_torq1['text'] = self.robot['torque'][0, 0]
         self.lbl_torq2['text'] = self.robot['torque'][1, 0]
         self.lbl_torq3['text'] = self.robot['torque'][2, 0]
-
 
     def get_args(self):
         parser = argparse.ArgumentParser()
