@@ -6,6 +6,7 @@ import os.path as path
 import working_area
 import hand_draw
 import mymath
+import math
 
 import numpy as np
 import matplotlib
@@ -74,7 +75,7 @@ def calc_inverse_km(robot):
 
     a1 = robot['a'] - l3 * mymath.cosd(theta)
     b1 = robot['b'] - l3 * mymath.sind(theta)
-    r = mymath.hypoten(a1, b1)
+    r = math.hypot(a1, b1)
     alpha = mymath.alpha(l1, l2, r)
 
     robot['q_inv1'] = _calc_inverse_km(a1, b1, r, l1, theta, +alpha)

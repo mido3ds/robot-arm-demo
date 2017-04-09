@@ -29,9 +29,5 @@ def tand(x):
     return math.tan(math.radians(x))
 
 
-def alpha(l1, l2, r): 
+def alpha(l1, l2, r):
     return acosd((l1 ** 2 + r ** 2 - l2 ** 2) / (2 * l1 * r))
-
-
-def hypoten(a, b):
-    return math.sqrt(a ** 2 + b ** 2)
