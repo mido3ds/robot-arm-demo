@@ -72,7 +72,6 @@ def calc_inverse_km(robot):
     l2 = robot['l'][1]
     l3 = robot['l'][2]
 
-
     a1 = robot['a'] - l3 * mymath.cosd(theta)
     b1 = robot['b'] - l3 * mymath.sind(theta)
     r = mymath.hypoten(a1, b1)
@@ -123,20 +122,28 @@ def calc_jacobian(robot):
 
 def calc_all(robot, step):
     ''' cal all missing data for robot, then return it '''
-    try: calc_working_area(robot, step)
-    except: raise Exception('error while calculating working area')
+    try:
+        calc_working_area(robot, step)
+    except:
+        raise Exception('error while calculating working area')
 
     if robot['do_inverse']:
-        try: calc_inverse_km(robot)
-        except: raise Exception('error while calculating inverse km')
+        try:
+            calc_inverse_km(robot)
+        except:
+            raise Exception('error while calculating inverse km')
     else:
         robot['q_inv1'] = robot['q_torq']
 
-    try: calc_jacobian(robot)
-    except: raise Exception('error while calculating jacobian')
+    try:
+        calc_jacobian(robot)
+    except:
+        raise Exception('error while calculating jacobian')
 
-    try: calc_torque(robot)
-    except: raise Exception('error while calculating torque')
+    try:
+        calc_torque(robot)
+    except:
+        raise Exception('error while calculating torque')
 
     return robot
 
@@ -192,7 +199,7 @@ class App(tk.Frame):
         self.lbl_a = tk.Label(self)
         self.lbl_a.pack(side='bottom')
         tk.Label(self, text='a').pack(side='bottom')
-        
+
         # update once
         self.update_ui(None)
 
