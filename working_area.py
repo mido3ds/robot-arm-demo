@@ -11,9 +11,9 @@ class gl:
         self.pos = 0
         self.p2, self.p3, self.p4 = Point(0, 0), Point(0, 0), Point(0, 0)
         self.lq1, self.lq2, self.lq3 = None, None, None
-        self.arr = 0
-        self.l = 0
-        self.size = 0
+        self.arr = None
+        self.l = None
+        self.step = None
 
 
 def nums_in_range(start, end, step):
@@ -26,10 +26,10 @@ def nums_in_range(start, end, step):
         return result + 1
 
 
-def _calc_xy(q1, q2, q3, myglobal, step):
-    for i1 in range(q1[0], q1[1] + 1, step):
-        for i2 in range(q2[0], q2[1] + 1, step):
-            for i3 in range(q3[0], q3[1] + 1, step):
+def _calc_xy(q1, q2, q3, myglobal, pos):
+    for i1 in range(q1[0], q1[1] + 1, myglobal.step):
+        for i2 in range(q2[0], q2[1] + 1, myglobal.step):
+            for i3 in range(q3[0], q3[1] + 1, myglobal.step):
                 if i1 != myglobal.lq1:
                     myglobal.p2 = Point(
                         myglobal.l[0] * mymath.cosd(i1),
@@ -47,10 +47,10 @@ def _calc_xy(q1, q2, q3, myglobal, step):
                 )
 
                 # store it in array
-                myglobal.arr[myglobal.pos, 0] = p4.x
-                myglobal.arr[myglobal.pos, 1] = p4.y
+                myglobal.arr[pos, 0] = p4.x
+                myglobal.arr[pos, 1] = p4.y
 
-                myglobal.pos += 1
+                pos += 1
 
 
 def get_xy(q1, q2, q3, l, step):
@@ -60,15 +60,18 @@ def get_xy(q1, q2, q3, l, step):
 
     myglobal = gl()
 
-    myglobal.size = nums_in_range(q1[0], q1[1], step) \
+    half_q = int(np.ceil((sum(q1)) / 2))
+
+    half_size = nums_in_range(q1[0], half_q, step) \
         * nums_in_range(q2[0], q1[1], step) \
         * nums_in_range(q3[0], q1[1], step)
 
-    myglobal.arr = np.zeros((myglobal.size, 2))
+    myglobal.arr = np.zeros((half_size * 2, 2))
     myglobal.l = l
+    myglobal.step = step
 
-    
-    _calc_xy(q1, q2, q3, myglobal, step)
+    _calc_xy((q1[0], half_q), q2, q3, myglobal, pos=0)
+    _calc_xy((half_q, q1[1]), q2, q3, myglobal, pos=half_size)
 
     x = myglobal.arr[:, 0].view()
     y = myglobal.arr[:, 1].view()

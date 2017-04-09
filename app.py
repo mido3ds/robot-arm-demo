@@ -128,14 +128,13 @@ def calc_jacobian(robot):
 
 def calc_all(robot, step):
     ''' cal all missing data for robot, then return it '''
-    try:
-        calc_working_area(robot, step)
-        if robot['do_inverse']:
-            calc_inverse_km(robot)
-        calc_jacobian(robot)
-        calc_torque(robot)
-    except:
-        print('Mathmatical Error, please review numbers in file')
+    calc_working_area(robot, step)
+    if robot['do_inverse']:
+        calc_inverse_km(robot)
+    calc_jacobian(robot)
+    calc_torque(robot)
+    # except:
+    #     print('Mathmatical Error, please review numbers in file')
 
     return robot
 
