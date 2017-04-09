@@ -1,16 +1,6 @@
 import mymath
 import multiprocessing as mpr
 import numpy as np
-from collections import namedtuple
-
-Point = namedtuple('Point', ['x', 'y'])
-
-
-class gl:
-    ''' globals namespace '''
-    arr = None
-    l = None
-    step = None
 
 
 def _nums_in_range(start, end, step):
@@ -23,61 +13,48 @@ def _nums_in_range(start, end, step):
         return result + 1
 
 
-def _calc_xy(q1, q2, q3, pos):
-    ''' calc part of xy, to be able to make multiprocess '''
-    lq1, lq2 = None, None
-    p2, p3 = Point(0, 0), Point(0, 0)
+def _calc_xy(q1, q2, q3, l, size, step, func):
+    ''' calc part of x or y, to be able to make multiprocess '''
+    li1, li2 = None, None
+    p2, p3 = 0, 0
 
-    print('i have started', 'l is {}'.format(gl.l), 'arr is {}'.format(gl.arr), 'pos is {}'.format(pos))
-    for i1 in range(q1[0], q1[1] + 1, gl.step):
-        for i2 in range(q2[0], q2[1] + 1, gl.step):
-            for i3 in range(q3[0], q3[1] + 1, gl.step):
-                if i1 != lq1:
-                    p2 = Point(
-                        gl.l[0] * mymath.cosd(i1),
-                        gl.l[0] * mymath.sind(i1)
-                    )
-                if i2 != lq2:
-                    p3 = Point(
-                        p2.x + gl.l[1] * mymath.cosd(i1 + i2),
-                        p2.y + gl.l[1] * mymath.sind(i1 + i2)
-                    )
+    # create array
+    arr = np.zeros(size)
 
-                p4 = Point(
-                    p2.x + p3.x +
-                    gl.l[2] * mymath.cosd(i1 + i2 + i3),
-                    p2.y + p3.y +
-                    gl.l[2] * mymath.sind(i1 + i2 + i3)
-                )
+    print('i have started', 'l is {}'.format(l),
+          'arr is {}'.format(arr), 'pos is {}'.format(pos))
+
+    for i1 in range(q1[0], q1[1] + 1, step):
+        for i2 in range(q2[0], q2[1] + 1, step):
+            for i3 in range(q3[0], q3[1] + 1, step):
+                if i1 != li1:
+                    p2 = l[0] * func(i1)
+                if i2 != li2:
+                    p3 = p2.x + l[1] * func(i1 + i2)
+
+                p4 = p2.x + p3.x + l[2] * func(i1 + i2 + i3)
 
                 # store it in array
-                gl.arr[pos, 0] = p4.x
-                gl.arr[pos, 1] = p4.y
+                arr[pos] = p4
 
                 pos += 1
-    print('i have finished', 'l is {}'.format(gl.l), 'arr is {}'.format(gl.arr), 'pos is {}'.format(pos))
+
+    print('i have finished', 'l is {}'.format(l),
+          'arr is {}'.format(arr), 'pos is {}'.format(pos))
+
 
 def get_xy(q1, q2, q3, l, step):
     '''return x,y numpy.arrays of points to be plotted
         step: int, step of iteration
     '''
 
-    half_q = int(np.ceil((sum(q1)) / 2))
-    half_size = _nums_in_range(q1[0], half_q, step) \
+    size = _nums_in_range(q1[0], q1[1], step) \
         * _nums_in_range(q2[0], q1[1], step) \
         * _nums_in_range(q3[0], q1[1], step)
-
-    gl.arr = np.zeros((half_size * 2, 2))
-    gl.l = l
-    gl.step = step
-
-    mpr.Process(target=_calc_xy, args=((q1[0], half_q), q2, q3, 0)).start()
-    mpr.Process(target=_calc_xy, args=((half_q, q1[1]), q2, q3, half_size)).start()
-
-    x = gl.arr[:, 0].view()
-    y = gl.arr[:, 1].view()
-
-    return x, y
+    
+    # ok i will get back
+    mpr.Process(target=_calc_xy, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
+    mpr.Process(target=_calc_xy, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
 
 
 def test():
