@@ -15,14 +15,12 @@ def _nums_in_range(start, end, step):
 
 def _calc_part(q1, q2, q3, l, size, step, func):
     ''' calc part of x or y, to be able to make multiprocess '''
+    print('started', func)
     li1, li2 = None, None
-    p2, p3 = 0, 0
+    p2, p3, pos = 0, 0, 0
 
     # create array
     arr = np.zeros(size)
-
-    print('i have started', 'l is {}'.format(l),
-          'arr is {}'.format(arr), 'pos is {}'.format(pos))
 
     for i1 in range(q1[0], q1[1] + 1, step):
         for i2 in range(q2[0], q2[1] + 1, step):
@@ -30,31 +28,42 @@ def _calc_part(q1, q2, q3, l, size, step, func):
                 if i1 != li1:
                     p2 = l[0] * func(i1)
                 if i2 != li2:
-                    p3 = p2.x + l[1] * func(i1 + i2)
+                    p3 = p2 + l[1] * func(i1 + i2)
 
-                p4 = p2.x + p3.x + l[2] * func(i1 + i2 + i3)
+                p4 = p2 + p3 + l[2] * func(i1 + i2 + i3)
 
                 # store it in array
                 arr[pos] = p4
-
                 pos += 1
-
-    print('i have finished', 'l is {}'.format(l),
-          'arr is {}'.format(arr), 'pos is {}'.format(pos))
+    print('ended', func)
+    return arr
 
 
 def get_xy(q1, q2, q3, l, step):
     '''return x,y numpy.arrays of points to be plotted
+
         step: int, step of iteration
     '''
 
     size = _nums_in_range(q1[0], q1[1], step) \
         * _nums_in_range(q2[0], q1[1], step) \
         * _nums_in_range(q3[0], q1[1], step)
-    
-    # ok i will get back
-    mpr.Process(target=_calc_part, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
-    mpr.Process(target=_calc_part, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
+
+    # calc x
+    px = mpr.Process(target=_calc_part,
+                     args=(q1, q2, q3, l, size, step, mymath.cosd))
+    # calc y
+    py = mpr.Process(target=_calc_part,
+                     args=(q1, q2, q3, l, size, step, mymath.sind))
+
+    px.start()
+    py.start()
+    px.join()
+    py.join()
+    print('jioned both')
+
+    # x,y cant be returned this way, coming back
+    return [0, 0], [0, 0]
 
 
 def test():
