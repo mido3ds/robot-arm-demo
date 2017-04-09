@@ -1,5 +1,5 @@
 # True to do inverse Kinematics, False otherwise
-do_inverse = False
+do_inverse = True
 
 ##################       GENERAL      ####################
 
@@ -19,5 +19,5 @@ q           =       [[-90, 90],    # <= [q1_min, q2_max]
 
 ###################  INVERSE KINEMATICS  ################# >>> l, a, b, θ 
 
-a           =       0
-b           =       0
+a           =       27.32
+b           =       47.32

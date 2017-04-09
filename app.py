@@ -72,9 +72,10 @@ def calc_inverse_km(robot):
     l2 = robot['l'][1]
     l3 = robot['l'][2]
 
+
     a1 = robot['a'] - l3 * mymath.cosd(theta)
     b1 = robot['b'] - l3 * mymath.sind(theta)
-    r = mymath.hypotenuse(a1, b1)
+    r = mymath.hypoten(a1, b1)
     alpha = mymath.alpha(l1, l2, r)
 
     robot['q_inv1'] = _calc_inverse_km(a1, b1, r, l1, theta, +alpha)
@@ -83,8 +84,8 @@ def calc_inverse_km(robot):
 
 def _calc_inverse_km(a1, b1, r, l1, theta, alpha):
     ''' get one part '''
-    q1 = mymath.atan2d(b1 / a1) - alpha
-    q2 = mymath.atan2d((r * np.sin(alpha)) / (r * np.acos(alpha) - l1))
+    q1 = mymath.atan2d(b1, a1) - alpha
+    q2 = mymath.atan2d((r * mymath.sind(alpha)), (r * mymath.cosd(alpha) - l1))
     q3 = theta - q1 - q2
     return np.array([q1, q2, q3])
 
@@ -122,16 +123,20 @@ def calc_jacobian(robot):
 
 def calc_all(robot, step):
     ''' cal all missing data for robot, then return it '''
-    try:
-        calc_working_area(robot, step)
-        if robot['do_inverse']:
-            calc_inverse_km(robot)
-        else:
-            robot['q_inv1'] = robot['q_torq']
-        calc_jacobian(robot)
-        calc_torque(robot)
-    except:
-        print('Mathmatical Error, please review numbers in file')
+    try: calc_working_area(robot, step)
+    except: raise Exception('error while calculating working area')
+
+    if robot['do_inverse']:
+        try: calc_inverse_km(robot)
+        except: raise Exception('error while calculating inverse km')
+    else:
+        robot['q_inv1'] = robot['q_torq']
+
+    try: calc_jacobian(robot)
+    except: raise Exception('error while calculating jacobian')
+
+    try: calc_torque(robot)
+    except: raise Exception('error while calculating torque')
 
     return robot
 
@@ -180,6 +185,14 @@ class App(tk.Frame):
         self.lbl_torq1.pack(side='bottom')
         tk.Label(self, text='torque1').pack(side='bottom')
 
+        self.lbl_b = tk.Label(self)
+        self.lbl_b.pack(side='bottom')
+        tk.Label(self, text='b').pack(side='bottom')
+
+        self.lbl_a = tk.Label(self)
+        self.lbl_a.pack(side='bottom')
+        tk.Label(self, text='a').pack(side='bottom')
+        
         # update once
         self.update_ui(None)
 
@@ -207,6 +220,9 @@ class App(tk.Frame):
         self.lbl_torq1['text'] = self.robot['torque'][0, 0]
         self.lbl_torq2['text'] = self.robot['torque'][1, 0]
         self.lbl_torq3['text'] = self.robot['torque'][2, 0]
+
+        self.lbl_a['text'] = self.robot['a']
+        self.lbl_b['text'] = self.robot['b']
 
     def get_args(self):
         parser = argparse.ArgumentParser()
