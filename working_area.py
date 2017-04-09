@@ -7,13 +7,13 @@ Point = namedtuple('Point', ['x', 'y'])
 
 class gl:
     ''' globals '''
-    @staticmethod
-    def reset():
-        gl.pos = 0
-        gl.p2, gl.p3, gl.p4 = Point(0, 0), Point(0, 0), Point(0, 0)
-        gl.lq1, gl.lq2, gl.lq3 = None, None, None
-        gl.arr = 0
-        gl.l = 0
+    def __init__(self):
+        self.pos = 0
+        self.p2, self.p3, self.p4 = Point(0, 0), Point(0, 0), Point(0, 0)
+        self.lq1, self.lq2, self.lq3 = None, None, None
+        self.arr = 0
+        self.l = 0
+        self.size = 0
 
 
 def nums_in_range(start, end, step):
@@ -26,28 +26,31 @@ def nums_in_range(start, end, step):
         return result + 1
 
 
-def _calc_xy(q1, q2, q3):
-    if q1 != gl.lq1:
-        gl.p2 = Point(
-            gl.l[0] * mymath.cosd(q1),
-            gl.l[0] * mymath.sind(q1)
-        )
-    if q2 != gl.lq2:
-        gl.p3 = Point(
-            gl.p2.x + gl.l[1] * mymath.cosd(q1 + q2),
-            gl.p2.y + gl.l[1] * mymath.sind(q1 + q2)
-        )
+def _calc_xy(q1, q2, q3, myglobal, step):
+    for i1 in range(q1[0], q1[1] + 1, step):
+        for i2 in range(q2[0], q2[1] + 1, step):
+            for i3 in range(q3[0], q3[1] + 1, step):
+                if i1 != myglobal.lq1:
+                    myglobal.p2 = Point(
+                        myglobal.l[0] * mymath.cosd(i1),
+                        myglobal.l[0] * mymath.sind(i1)
+                    )
+                if i2 != myglobal.lq2:
+                    myglobal.p3 = Point(
+                        myglobal.p2.x + myglobal.l[1] * mymath.cosd(i1 + i2),
+                        myglobal.p2.y + myglobal.l[1] * mymath.sind(i1 + i2)
+                    )
 
-    p4 = Point(
-        gl.p2.x + gl.p3.x + gl.l[2] * mymath.cosd(q1 + q2 + q3),
-        gl.p2.y + gl.p3.y + gl.l[2] * mymath.sind(q1 + q2 + q3)
-    )
+                p4 = Point(
+                    myglobal.p2.x + myglobal.p3.x + myglobal.l[2] * mymath.cosd(i1 + i2 + i3),
+                    myglobal.p2.y + myglobal.p3.y + myglobal.l[2] * mymath.sind(i1 + i2 + i3)
+                )
 
-    # store it in array
-    gl.arr[gl.pos, 0] = p4.x
-    gl.arr[gl.pos, 1] = p4.y
+                # store it in array
+                myglobal.arr[myglobal.pos, 0] = p4.x
+                myglobal.arr[myglobal.pos, 1] = p4.y
 
-    gl.pos += 1
+                myglobal.pos += 1
 
 
 def get_xy(q1, q2, q3, l, step):
@@ -55,19 +58,20 @@ def get_xy(q1, q2, q3, l, step):
         step: int, step of iteration
     '''
 
-    gl.reset()
+    myglobal = gl()
 
-    size = nums_in_range(*q1, step) * nums_in_range(*q2, step) * nums_in_range(*q3, step)
-    gl.arr = np.zeros((size, 2))
-    gl.l = l
+    myglobal.size = nums_in_range(q1[0], q1[1], step) \
+        * nums_in_range(q2[0], q1[1], step) \
+        * nums_in_range(q3[0], q1[1], step)
 
-    for i1 in range(q1[0], q1[1] + 1, step):
-        for i2 in range(q2[0], q2[1] + 1, step):
-            for i3 in range(q3[0], q3[1] + 1, step):
-                _calc_xy(i1, i2, i3)
+    myglobal.arr = np.zeros((myglobal.size, 2))
+    myglobal.l = l
 
-    x = gl.arr[:, 0].view()
-    y = gl.arr[:, 1].view()
+    
+    _calc_xy(q1, q2, q3, myglobal, step)
+
+    x = myglobal.arr[:, 0].view()
+    y = myglobal.arr[:, 1].view()
 
     return x, y
 

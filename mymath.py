@@ -30,9 +30,6 @@ def tand(x):
 
 
 def alpha(l1, l2, r):
-    print('l1', l1)
-    print('l2', l2)
-    print('r', r)
     return acosd((l1 ** 2 + r ** 2 - l2 ** 2) / 2 * l1 * r)
 
 
