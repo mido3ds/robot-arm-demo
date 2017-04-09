@@ -13,7 +13,7 @@ def _nums_in_range(start, end, step):
         return result + 1
 
 
-def _calc_xy(q1, q2, q3, l, size, step, func):
+def _calc_part(q1, q2, q3, l, size, step, func):
     ''' calc part of x or y, to be able to make multiprocess '''
     li1, li2 = None, None
     p2, p3 = 0, 0
@@ -53,8 +53,8 @@ def get_xy(q1, q2, q3, l, step):
         * _nums_in_range(q3[0], q1[1], step)
     
     # ok i will get back
-    mpr.Process(target=_calc_xy, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
-    mpr.Process(target=_calc_xy, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
+    mpr.Process(target=_calc_part, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
+    mpr.Process(target=_calc_part, args=(q1, q2, q3, l, size, step, mymath.sind)).start()
 
 
 def test():
