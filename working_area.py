@@ -15,7 +15,6 @@ def _nums_in_range(start, end, step):
 
 def _calc_part(q1, q2, q3, l, size, step, func):
     ''' calc part of x or y, to be able to make multiprocess '''
-    print('started', func)
     li1, li2 = None, None
     p2, p3, pos = 0, 0, 0
 
@@ -35,7 +34,7 @@ def _calc_part(q1, q2, q3, l, size, step, func):
                 # store it in array
                 arr[pos] = p4
                 pos += 1
-    print('ended', func)
+
     return arr
 
 
@@ -49,21 +48,11 @@ def get_xy(q1, q2, q3, l, step):
         * _nums_in_range(q2[0], q1[1], step) \
         * _nums_in_range(q3[0], q1[1], step)
 
-    # calc x
-    px = mpr.Process(target=_calc_part,
-                     args=(q1, q2, q3, l, size, step, mymath.cosd))
-    # calc y
-    py = mpr.Process(target=_calc_part,
-                     args=(q1, q2, q3, l, size, step, mymath.sind))
+    with mpr.Pool() as p:
+        x, y = p.starmap(_calc_part,
+                         [(q1, q2, q3, l, size, step, mymath.cosd), (q1, q2, q3, l, size, step, mymath.sind)])
 
-    px.start()
-    py.start()
-    px.join()
-    py.join()
-    print('jioned both')
-
-    # x,y cant be returned this way, coming back
-    return [0, 0], [0, 0]
+    return x, y
 
 
 def test():
