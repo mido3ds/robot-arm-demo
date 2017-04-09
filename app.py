@@ -1,5 +1,6 @@
 #!/usr/bin/env python3.6
 import argparse
+import threading as thr
 import os.path as path
 
 import working_area
@@ -47,13 +48,13 @@ def read_file(file_name):
             'q_torq': np.array(locals()['q_torq']),  # 1D array
             'pex': np.matrix(locals()['Pex']).transpose(),  # 2D 3x1 matrix
 
-            'q': locals()['q'],
+            'q': np.array(locals()['q']),
             'a': locals()['a'],
             'b': locals()['b'],
 
             # added
-            'torque': np.zeros((3,1)),
-            'jacob': np.zeros((3,3))
+            'torque': np.zeros((3, 1)),
+            'jacob': np.zeros((3, 3))
         }
     except:
         raise Exception('cant get variables from file,'
@@ -92,14 +93,7 @@ def _calc_inverse_km(a1, b1, r, l1, theta, alpha):
 
 def calc_working_area(robot, step):
     ''' return all x, y of end effector to plot '''
-    robot['work_area'] = working_area.get_xy(
-        q1=robot['q'][0],
-        q2=robot['q'][1],
-        q3=robot['q'][2],
-        l=robot['l'],
-
-        step=step,
-    )
+    robot['work_area'] = working_area.get_xy(robot, step)
 
 ########################################################################
 
@@ -128,13 +122,16 @@ def calc_jacobian(robot):
 
 def calc_all(robot, step):
     ''' cal all missing data for robot, then return it '''
-    calc_working_area(robot, step)
-    if robot['do_inverse']:
-        calc_inverse_km(robot)
-    calc_jacobian(robot)
-    calc_torque(robot)
-    # except:
-    #     print('Mathmatical Error, please review numbers in file')
+    try:
+        calc_working_area(robot, step)
+        if robot['do_inverse']:
+            calc_inverse_km(robot)
+        else:
+            robot['q_inv1'] = robot['q_torq']
+        calc_jacobian(robot)
+        calc_torque(robot)
+    except:
+        print('Mathmatical Error, please review numbers in file')
 
     return robot
 
@@ -190,22 +187,26 @@ class App(tk.Frame):
         self.robot = read_file(self.args.input_file)
         self.robot = calc_all(robot=self.robot, step=self.args.step)
 
-        # labels
-        self.lbl_torq1['text'] = self.robot['torque'][0, 0]
-        self.lbl_torq2['text'] = self.robot['torque'][1, 0]
-        self.lbl_torq3['text'] = self.robot['torque'][2, 0]
+        self._update_hand()
+        thr.Thread(target=self._update_labels).start()
+        thr.Thread(target=self._update_plot).start()
 
-        # draw
-        self.drawer.robot = self.robot
-        self.drawer.draw()
-
-        # plot
+    def _update_plot(self):
         self.fig.clear()
         self.subplt = self.fig.add_subplot(111)
 
         x, y = self.robot['work_area']
         self.subplt.plot(x, y, 'g.')
         self.plt_canvas.draw()
+
+    def _update_hand(self):
+        self.drawer.robot = self.robot
+        self.drawer.draw()
+
+    def _update_labels(self):
+        self.lbl_torq1['text'] = self.robot['torque'][0, 0]
+        self.lbl_torq2['text'] = self.robot['torque'][1, 0]
+        self.lbl_torq3['text'] = self.robot['torque'][2, 0]
 
     def get_args(self):
         parser = argparse.ArgumentParser()
